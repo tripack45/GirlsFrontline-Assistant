@@ -4,6 +4,7 @@ import tqdm
 import time
 import device
 import log
+import resource.cache as cache
 import logging
 import resource
 import math
@@ -57,7 +58,8 @@ def getScreenshot():
 def loadImageByKey(scene, key):
     logger = logging.getLogger(__name__)
     logger.info('Request to load Image "%s" => "%s' % (scene, key))
-    return image.loadResourceImage(resource.images[scene][key])
+    return cache.cacheLoadImage(scene, key)
+    #return image.loadResourceImage(resource.images[scene][key])
 
 
 def isAround(pt1, pt2, dis=30):
