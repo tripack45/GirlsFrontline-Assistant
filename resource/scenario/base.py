@@ -28,11 +28,11 @@ class SceneBaseNormal(api.Scenario):
         return True
 
     @classmethod
-    def getButtonShowTime(cls):
+    def getButtonShowTime(cls, img=None):
         return (15, 378)
 
     @classmethod
-    def getButtonCombat(cls):
+    def getButtonCombat(cls, img=None):
         return (930, 540)
 
 
@@ -41,5 +41,5 @@ class ScenceBaseTime(api.Scenario):
     name = 'Base Scene (With Time)'
 
     @classmethod
-    def getButtonCloseTime(cls):
+    def getButtonCloseTime(cls, img=None):
         return (777, 381)

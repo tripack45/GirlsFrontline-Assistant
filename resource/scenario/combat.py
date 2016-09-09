@@ -30,7 +30,7 @@ class SceneCombat(api.Scenario):
         return match
 
     @classmethod
-    def buttonReturnBase(cls):
+    def buttonReturnBase(cls, img = None):
         return (57, 40)
 
 
@@ -59,11 +59,11 @@ class CombatSetting(api.Scenario):
         return True
 
     @classmethod
-    def selectAutoCombat(cls):
+    def selectAutoCombat(cls, img=None):
         return (685, 600)
 
     @classmethod
-    def selectNormalCombat(cls):
+    def selectNormalCombat(cls, img=None):
         return (880, 600)
 
 
@@ -88,7 +88,7 @@ class AutoCombatSelectTeam(api.Scenario):
         return True
 
     @classmethod
-    def beginSelectTeam(cls):
+    def beginSelectTeam(cls, img=None):
         # Currently support only single team
         return (635, 328)
 
@@ -99,7 +99,7 @@ class AutoCombatSelectTeam(api.Scenario):
         if match is None: return False
 
     @classmethod
-    def confirmSelection(cls):
+    def confirmSelection(cls, img=None):
         return (1020, 590)
 
 
@@ -132,6 +132,6 @@ class TeamSelection(api.Scenario):
         return match
 
     @classmethod
-    def SelectConfirm(cls):
+    def SelectConfirm(cls, img=None):
         return (1170, 660)
 
