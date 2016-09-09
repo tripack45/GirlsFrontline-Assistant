@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import logging
 import enum
+import math
 
 from config import *
 
@@ -110,9 +111,11 @@ def matchTemplate(img: np.ndarray, template: np.ndarray) -> np.ndarray:
     resG = cv2.matchTemplate(imG, templateG, method)
     resB = cv2.matchTemplate(imB, templateB, method)
     res =  cv2.sqrt(resR * resR + resB * resB + resG * resG)
+    # TODO: Change match scoore into logarithm other then linear
     res *= (255.0 / res.max())  #Normalize to 255 for imshow()
     res = np.rint(res).astype('uint8')
     return res
+
 
 
 def matchTemplateExact(img:np.ndarray, template:np.ndarray):
@@ -123,4 +126,15 @@ def matchTemplateExact(img:np.ndarray, template:np.ndarray):
     center = (top_left[0] + tsize[0] // 2 ,
               top_left[1] + tsize[1] // 2)  # (x,y)
     return center, min_val
+
+
+def diffImage(img1:np.ndarray, img2:np.ndarray):
+    if img1.shape != img2.shape:
+        raise ValueError('Differencing image of different size')
+    imgDiff = (img1 != img2)
+    s = imgDiff.sum()
+    return s / 10000
+    # Identicle 0; Major Difference 287.8
+    # Medium Difference: 28
+    # Minor Difference: 18
 
