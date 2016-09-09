@@ -1,4 +1,5 @@
 import api
+import image
 import resource.scenario.base as base
 import resource.scenario.combat as combat
 
@@ -15,6 +16,8 @@ def transition(prevScene, nextScene, actionCoords):
         try:
             for i in api.retry(5):
                 logger.info('Retry %d ...' % i)
+                if i >= 3:
+                    api.touchAt(250, 250)
                 api.delay(3)
                 img = api.getScreenshot()
                 if nextScene.isMatch(img):
@@ -36,6 +39,8 @@ def setup():
         try:
             for i in api.retry(5):
                 logger.info('Retry %d ...' % i)
+                if i >= 3:
+                    api.touchAt((250, 250))
                 api.delay(3)
                 img = api.getScreenshot()
                 if base.SceneBaseNormal.isMatch(img):
@@ -50,15 +55,32 @@ def do():
     buttonCombat = base.SceneBaseNormal.getButtonCombat()
     api.touchAt(buttonCombat)
     logger.info('Simulate TouchAt(ButtonCombat)')
-    api.delay(5)
+    api.delay(3)
 
     img = transition(base.SceneBaseNormal,
                      combat.SceneCombat,
                      buttonCombat)
+    logger.info('Trying to identify "buttonMap1_2"')
     buttonMap1_2 = combat.SceneCombat.getButtonMap1_2(img)
+    if buttonMap1_2 is None:
+        try:
+            for i in api.retry(5):
+                logger.info('Retry %d ...' % i)
+                if i >= 3:
+                    api.touchAt(250, 250)
+                api.delay(3)
+                img = api.getScreenshot()
+                buttonMap1_2 = combat.SceneCombat.getButtonMap1_2(img)
+                if not (buttonMap1_2 is None):
+                    break
+        except RuntimeError:
+            image.writePNG('Bug.png',img)
+            logger.error('Cannot Identify')
+            raise
+    logger.info('Button Identified')
     api.touchAt(buttonMap1_2)
     logger.info('Simulate TouchAt(buttonMap1_2)')
-    api.delay(2)
+    api.delay(1)
 
     img = transition(combat.SceneCombat,
                      combat.CombatSetting,
@@ -66,7 +88,7 @@ def do():
     buttonAuto = combat.CombatSetting.selectAutoCombat()
     api.touchAt(buttonAuto)
     logger.info('Simulate TouchAt(buttonAuto)')
-    api.delay(2)
+    api.delay(1)
 
     img = transition(combat.CombatSetting,
                      combat.AutoCombatSelectTeam,
@@ -74,15 +96,36 @@ def do():
     buttonSelect = combat.AutoCombatSelectTeam.beginSelectTeam()
     api.touchAt(buttonSelect)
     logger.info('Simulate TouchAt(buttonSelect)')
-    api.delay(2)
+    api.delay(1)
 
     img = transition(combat.AutoCombatSelectTeam,
                      combat.TeamSelection,
                      buttonMap1_2)
+    logger.info('Trying to identify "tag2"')
     tag2 = combat.TeamSelection.Team2(img)
-    api.touchAt(tag2)
-    logger.info('Simulate TouchAt(tag2)')
-    api.delay(2)
+    tag2Sel = combat.TeamSelection.Team2Selected(img)
+    if (tag2 is None) and (tag2Sel is None):
+        try:
+            for i in api.retry(5):
+                logger.info('Retry %d ...' % i)
+                if i >= 3:
+                    api.touchAt(250, 250)
+                api.delay(3)
+                img = api.getScreenshot()
+                tag2 = combat.TeamSelection.Team2(img)
+                tag2Sel = combat.TeamSelection.Team2Selected(img)
+                if not ((tag2 is None) and (tag2Sel is None)):
+                    break
+        except RuntimeError:
+            logger.error('Cannot Identify')
+            raise
+    if tag2Sel is None:
+        logger.info('Button Identified')
+        api.touchAt(tag2)
+        logger.info('Simulate TouchAt(tag2)')
+        api.delay(1)
+    else:
+        logger.info('Tag2 already selected')
 
     img = api.getScreenshot()
     if not (combat.TeamSelection.Team2Selected(img)):
@@ -90,6 +133,8 @@ def do():
         try:
             for i in api.retry(5):
                 logger.info('Retry %d ...' % i)
+                if i >= 3:
+                    api.touchAt(250, 250)
                 api.delay(3)
                 img = api.getScreenshot()
                 if combat.TeamSelection.Team2Selected(img):
@@ -121,7 +166,7 @@ def do():
     logger.info('touchAt(buttonBeginAuto)')
     logger.info('Confirming Operation...')
 
-    api.delay(10)
+    api.delay(5)
     img = transition(combat.AutoCombatSelectTeam,
                      combat.SceneCombat,
                      buttonBeginAuto)
@@ -133,7 +178,7 @@ def do():
     api.touchAt(buttonReturnBase)
     logger.info('touchAt(buttonReturnBase)')
 
-    api.delay(5)
+    api.delay(3)
     img = transition(combat.AutoCombatSelectTeam,
                      base.SceneBaseNormal,
                      buttonReturnBase)
@@ -151,4 +196,7 @@ def do():
 if __name__ == '__main__':
     setup()
     while True:
-        do()
+        try:
+            do()
+        except RuntimeError:
+            api.touchAt((250, 250))
